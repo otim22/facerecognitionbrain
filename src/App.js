@@ -27,9 +27,9 @@ const initialState = {
       input: '',
       imageUrl: '',
       box: {},
-      route: 'home',
+      route: 'signin',
       isProfileOpen: false,
-      isSignedIn: true,
+      isSignedIn: false,
       user: {
         id: '',
         name: '',
@@ -45,6 +45,38 @@ class App extends Component {
   constructor() {
     super();
     this.state = initialState;
+  }
+
+  componentDidMount () {
+    const token = window.sessionStorage.getItem('token');
+    if (token) {
+      fetch('https://blooming-inlet-99312.herokuapp.com/signin', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        }
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data && data.id) {
+          console.log('sucess we need to get user profile');
+          fetch(`https://blooming-inlet-99312.herokuapp.com/profile/${data.id}`, {
+            method: 'get',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': token
+            }
+          })
+          .then(resp => resp.json())
+          .then(user => {
+            this.loadUser(user)
+            this.onRouteChange('home')
+          })
+        }
+      })
+      .catch(console.log)
+    }
   }
   
   loadUser = (data) => {
@@ -144,8 +176,12 @@ class App extends Component {
         { route === 'home'
           ? <div>
               <Logo />
-              <Rank name={user.name} entries={user.entries} />
-              <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
+              <Rank 
+                name={user.name} 
+                entries={user.entries} />
+              <ImageLinkForm 
+                onInputChange={this.onInputChange} 
+                onButtonSubmit={this.onButtonSubmit} />
               <FaceRecognition box={box} imageUrl={imageUrl} />
             </div>
           : (
