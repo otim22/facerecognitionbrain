@@ -35,7 +35,9 @@ const initialState = {
         name: '',
         email: '',
         entries: 0,
-        joined: ''
+        joined: '',
+        pet: '',
+        age: ''
       }
   };
 
@@ -122,7 +124,7 @@ class App extends Component {
   }
 
   render() {
-    const { isSignedIn, imageUrl, route, box, isProfileOpen } = this.state;
+    const { isSignedIn, imageUrl, route, box, isProfileOpen, user } = this.state;
     return (
       <div className="App">
         <Particles className='particles'
@@ -132,13 +134,17 @@ class App extends Component {
           toggleModal={this.toggleModal} />
         { isProfileOpen &&
           <Modal>
-            <Profile isProfileOpen={isProfileOpen} toggleModal={this.toggleModal} />
+            <Profile 
+              isProfileOpen={isProfileOpen} 
+              toggleModal={this.toggleModal} 
+              loadUser={this.loadUser}
+              user={user} />
           </Modal>
         }
         { route === 'home'
           ? <div>
               <Logo />
-              <Rank name={this.state.user.name} entries={this.state.user.entries} />
+              <Rank name={user.name} entries={user.entries} />
               <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
               <FaceRecognition box={box} imageUrl={imageUrl} />
             </div>
